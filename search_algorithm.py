@@ -8,7 +8,19 @@ import random_map
 import math
 
 
-class AStar:
+class search_algorithm:
+    def __init__(self, map):
+        self.map = map
+        self.open_set = []
+        self.close_set = []
+
+    def IsStartPoint(self, p):
+        return p.x == 0 and p.y == 0
+
+    def IsEndPoint(self, p):
+        return p.x == self.map.size - 1 and p.y == self.map.size - 1
+
+class AStar(search_algorithm):
     def __init__(self, map):
         self.map = map
         self.open_set = []
@@ -19,14 +31,14 @@ class AStar:
         x_dis = abs(p.x - 0)
         y_dis = abs(p.y - 0)
         # Distance to start point
-        return x_dis + y_dis + round((math.sqrt(2) - 2)*min(x_dis, y_dis), 1)
+        return x_dis + y_dis + round((math.sqrt(2) - 2)*min(x_dis, y_dis), 3)
 
     # 节点到终点的启发函数
     def HeuristicCost(self, p):
         x_dis = abs(self.map.size - 1 - p.x)
         y_dis = abs(self.map.size - 1 - p.y)
         # Distance to end point
-        return 2 * (x_dis + y_dis)
+        return (x_dis + y_dis)
 
     def TotalCost(self, p):
         return self.BaseCost(p) + self.HeuristicCost(p)
@@ -51,11 +63,11 @@ class AStar:
     def IsInCloseList(self, p):
         return self.IsInPointList(p, self.close_set)
 
-    def IsStartPoint(self, p):
-        return p.x == 0 and p.y == 0
+    # def IsStartPoint(self, p):
+    #     return p.x == 0 and p.y == 0
 
-    def IsEndPoint(self, p):
-        return p.x == self.map.size - 1 and p.y == self.map.size - 1
+    # def IsEndPoint(self, p):
+    #     return p.x == self.map.size - 1 and p.y == self.map.size - 1
 
     def RunAndSaveImage(self, ax, plt):
 
