@@ -37,14 +37,18 @@
 
 ##### BFS
 
-<img src="img/BFS.png" alt="A*示例" style="zoom:60%;" />
+<img src="img/BFS.png" alt="BFS示例" style="zoom:60%;" />
+
+##### DFS
+
+<img src="img/DFS.png" alt="DFS示例" style="zoom:60%;" />
 
 
 
 TODO：
 
 - [x] BFS
-- [ ] DFS
+- [x] DFS
 - [ ] Dijkstra
 - [ ] GBFS
 

@@ -24,7 +24,7 @@ for i in range(map.size):
             rec = Rectangle((i, j), width=1, height=1, edgecolor='gray', facecolor='w')
             ax.add_patch(rec)
 
-rec = Rectangle((0, 0), width = 1, height = 1, facecolor='b')
+rec = Rectangle((0, 0), width = 1, height = 1, facecolor='m')
 ax.add_patch(rec)
 
 rec = Rectangle((map.size-1, map.size-1), width = 1, height = 1, facecolor='r')
@@ -37,11 +37,14 @@ plt.tight_layout()
 
 plt.ion()
 
-a_star = search_algorithm.AStar(map)
-a_star.RunAndSaveImage(ax, plt)
+# a_star = search_algorithm.AStar(map)
+# a_star.RunAndSaveImage(ax, plt)
 
 # bfs = search_algorithm.BFS(map)
 # bfs.RunAndSaveImage(ax, plt)
+
+dfs = search_algorithm.DFS(map)
+dfs.RunAndSaveImage(ax, plt)
 
 
 plt.ioff()

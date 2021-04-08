@@ -58,10 +58,11 @@ class search_algorithm:
                 break
             else:
                 p = p.parent
-        for p in path:
+        for p in path[1:-1]:
             rec = Rectangle((p.x, p.y), 1, 1, color='lightgreen')
             ax.add_patch(rec)
-            plt.draw()
+        plt.draw()
+        plt.pause(1)
         self.SaveImage(plt, baseName)
         end_time = time.time()
 
@@ -109,11 +110,13 @@ class AStar(search_algorithm):
                 print('No path found, algorithm failed!!!')
                 return
             p = self.open_set[index]
-            rec = Rectangle((p.x, p.y), 1, 1, color='c')
-            ax.add_patch(rec)
             
-            # plt.draw()
-            plt.pause(0.05)
+            if (not (p.x==0 and p.y==0)) and (not (p.x==self.map.size-1 and p.y==self.map.size-1)):
+                rec = Rectangle((p.x, p.y), 1, 1, color='c')
+                ax.add_patch(rec)
+            
+                # plt.draw()
+                plt.pause(0.05)
             
             # self.SaveImage(plt)
 
@@ -230,12 +233,13 @@ class BFS(search_algorithm):
             if not p:
                 print('No path found, algorithm failed!!!')
                 return
-                        
-            rec = Rectangle((p.x, p.y), 1, 1, color='c')
-            ax.add_patch(rec)
-    
-            # plt.draw()
-            plt.pause(0.05)
+                      
+            if (not (p.x==0 and p.y==0)) and (not (p.x==self.map.size-1 and p.y==self.map.size-1)):                        
+                rec = Rectangle((p.x, p.y), 1, 1, color='c')
+                ax.add_patch(rec)
+        
+                # plt.draw()
+                # plt.pause(0.05)
 
             if self.IsEndPoint(p):
                 return self.BuildPath(p, ax, plt, start_time, baseName="BFS")
@@ -248,5 +252,66 @@ class BFS(search_algorithm):
             # 启发函数为曼哈顿距离，可以遍历上下左右4个点
             self.ProcessPoint(x-1, y, p)
             self.ProcessPoint(x, y-1, p)
+            self.ProcessPoint(x+1, y, p)
+            self.ProcessPoint(x, y+1, p)
+
+class DFS(search_algorithm):
+    def __init__(self, map):
+        self.map = map
+        self.open_set = []
+        self.close_set = []
+    
+    def selectPoint(self):
+        if len(self.open_set)==0:
+            return None
+        p = self.open_set.pop(-1)
+        return p
+
+    def ProcessPoint(self, x, y, parent):
+        # 不合法的点，不做处理
+        if not self.IsValidPoint(x, y):
+            return
+        p = random_map.Point(x, y)
+
+        # 邻点在close_set和open_set中，跳过
+        if self.IsInCloseList(p) or self.IsInOpenList(p):
+            return # Do nothing for visited point
+
+        else:
+            p.parent = parent
+            self.open_set.append(p)
+        print('Process Point [', p.x, ',', p.y, ']')
+
+    def RunAndSaveImage(self, ax, plt):
+        start_time = time.time()
+
+        start_point = random_map.Point(0, 0)
+        self.open_set.append(start_point)
+
+        while True:
+            p = self.selectPoint()
+            if not p:
+                print('No path found, algorithm failed!!!')
+                return
+                      
+            if (not (p.x==0 and p.y==0)) and (not (p.x==self.map.size-1 and p.y==self.map.size-1)):                        
+                rec = Rectangle((p.x, p.y), 1, 1, color='c')
+                ax.add_patch(rec)
+        
+                # plt.draw()
+                plt.pause(0.05)
+
+            if self.IsEndPoint(p):
+                return self.BuildPath(p, ax, plt, start_time, baseName="DFS")
+            
+            self.close_set.append(p)
+
+            # Process all neighbors
+            x = p.x
+            y = p.y
+            # 启发函数为曼哈顿距离，遍历下左上右4个点
+            # 因为终点在右上方，所以优先向上和右遍历
+            self.ProcessPoint(x, y-1, p)
+            self.ProcessPoint(x-1, y, p)
             self.ProcessPoint(x+1, y, p)
             self.ProcessPoint(x, y+1, p)
