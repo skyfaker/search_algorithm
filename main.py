@@ -8,7 +8,8 @@ import search_algorithm
 
 plt.figure(figsize=(5, 5))
 
-map = random_map.RandomMap(size=30)
+map_size = 15
+map = random_map.RandomMap(size=map_size)
 
 ax = plt.gca()
 ax.set_xlim([0, map.size])
@@ -38,5 +39,10 @@ plt.ion()
 
 a_star = search_algorithm.AStar(map)
 a_star.RunAndSaveImage(ax, plt)
+
+# bfs = search_algorithm.BFS(map)
+# bfs.RunAndSaveImage(ax, plt)
+
+
 plt.ioff()
 plt.show()

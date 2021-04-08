@@ -8,40 +8,12 @@ import random_map
 import math
 
 
+# 父类，定义公用方法
 class search_algorithm:
     def __init__(self, map):
         self.map = map
         self.open_set = []
         self.close_set = []
-
-    def IsStartPoint(self, p):
-        return p.x == 0 and p.y == 0
-
-    def IsEndPoint(self, p):
-        return p.x == self.map.size - 1 and p.y == self.map.size - 1
-
-class AStar(search_algorithm):
-    def __init__(self, map):
-        self.map = map
-        self.open_set = []
-        self.close_set = []
-
-    # 节点到起点的移动代价：曼哈顿距离
-    def BaseCost(self, p):
-        x_dis = abs(p.x - 0)
-        y_dis = abs(p.y - 0)
-        # Distance to start point
-        return x_dis + y_dis + round((math.sqrt(2) - 2)*min(x_dis, y_dis), 3)
-
-    # 节点到终点的启发函数
-    def HeuristicCost(self, p):
-        x_dis = abs(self.map.size - 1 - p.x)
-        y_dis = abs(self.map.size - 1 - p.y)
-        # Distance to end point
-        return (x_dis + y_dis)
-
-    def TotalCost(self, p):
-        return self.BaseCost(p) + self.HeuristicCost(p)
 
     # 判断点是否有效，不在地图内部或者障碍物所在点都是无效的。
     def IsValidPoint(self, x, y):
@@ -63,11 +35,61 @@ class AStar(search_algorithm):
     def IsInCloseList(self, p):
         return self.IsInPointList(p, self.close_set)
 
-    # def IsStartPoint(self, p):
-    #     return p.x == 0 and p.y == 0
+    def IsStartPoint(self, p):
+        return p.x == 0 and p.y == 0
 
-    # def IsEndPoint(self, p):
-    #     return p.x == self.map.size - 1 and p.y == self.map.size - 1
+    def IsEndPoint(self, p):
+        return p.x == self.map.size - 1 and p.y == self.map.size - 1
+
+    # 保存图片
+    def SaveImage(self, plt, baseName):
+        millis = int(round(time.time()))
+        filename = './img/' + baseName + str(millis) + '.png'
+        plt.savefig(filename)
+
+        # 回溯寻找路径，并绘制出来
+    def BuildPath(self, p, ax, plt, start_time, baseName):
+        path = []
+        while True:
+            path.insert(0, p) # Insert first
+            if self.IsStartPoint(p):
+                break
+            else:
+                p = p.parent
+        for p in path:
+            rec = Rectangle((p.x, p.y), 1, 1, color='lightgreen')
+            ax.add_patch(rec)
+            plt.draw()
+        self.SaveImage(plt, baseName)
+        end_time = time.time()
+
+        # 时间较长为绘图的原因
+        print('===== Algorithm finish in', end_time-start_time, ' seconds')
+        print('===== 路径长度：{}'.format(len(path)))
+
+
+class AStar(search_algorithm):
+    def __init__(self, map):
+        self.map = map
+        self.open_set = []
+        self.close_set = []
+
+    # 节点到起点的移动代价：曼哈顿距离
+    def BaseCost(self, p):
+        x_dis = abs(p.x - 0)
+        y_dis = abs(p.y - 0)
+        # Distance to start point
+        return x_dis + y_dis + round(float((math.sqrt(2) - 2)*min(x_dis, y_dis)), 3)
+
+    # 节点到终点的启发函数
+    def HeuristicCost(self, p):
+        x_dis = abs(self.map.size - 1 - p.x)
+        y_dis = abs(self.map.size - 1 - p.y)
+        # Distance to end point
+        return (x_dis + y_dis)
+
+    def TotalCost(self, p):
+        return self.BaseCost(p) + self.HeuristicCost(p)
 
     def RunAndSaveImage(self, ax, plt):
 
@@ -93,7 +115,7 @@ class AStar(search_algorithm):
             # self.SaveImage(plt)
 
             if self.IsEndPoint(p):
-                return self.BuildPath(p, ax, plt, start_time)
+                return self.BuildPath(p, ax, plt,start_time, baseName="AStar")
 
             del self.open_set[index]
             self.close_set.append(p)
@@ -116,12 +138,6 @@ class AStar(search_algorithm):
             # self.ProcessPoint(x+1, y, p)
             # self.ProcessPoint(x+1, y+1, p)
             # self.ProcessPoint(x, y+1, p)
-
-    # 保存图片
-    def SaveImage(self, plt):
-        millis = int(round(time.time() * 1000))
-        filename = './img/' + str(millis) + '.png'
-        plt.savefig(filename)
 
     # 算法关键点：判断邻点的状态，以选择下一个要遍历的点
     def ProcessPoint(self, x, y, parent):
@@ -166,21 +182,61 @@ class AStar(search_algorithm):
             index += 1
         return selected_index
 
-    # 回溯寻找路径，并绘制出来
-    def BuildPath(self, p, ax, plt, start_time):
-        path = []
-        while True:
-            path.insert(0, p) # Insert first
-            if self.IsStartPoint(p):
-                break
-            else:
-                p = p.parent
-        for p in path:
-            rec = Rectangle((p.x, p.y), 1, 1, color='g')
-            ax.add_patch(rec)
-            plt.draw()
-        self.SaveImage(plt)
-        end_time = time.time()
+class BFS(search_algorithm):
+    def __init__(self, map):
+        self.map = map
+        self.open_set = []
+        self.close_set = []
+    
+    def selectPoint(self):
+        if len(self.open_set)==0:
+            return None
+        p = self.open_set.pop(0)
+        return p
 
-        # 时间较长为绘图的原因
-        print('===== Algorithm finish in', end_time-start_time, ' seconds')
+    def ProcessPoint(self, x, y, parent):
+        # 不合法的点，不做处理
+        if not self.IsValidPoint(x, y):
+            return
+        p = random_map.Point(x, y)
+
+        # 邻点在close_set和open_set中，跳过
+        if self.IsInCloseList(p) or self.IsInOpenList(p):
+            return # Do nothing for visited point
+
+        else:
+            p.parent = parent
+            self.open_set.append(p)
+        print('Process Point [', p.x, ',', p.y, ']')
+
+    def RunAndSaveImage(self, ax, plt):
+        start_time = time.time()
+
+        start_point = random_map.Point(0, 0)
+        self.open_set.append(start_point)
+
+        while True:
+            p = self.selectPoint()
+            if not p:
+                print('No path found, algorithm failed!!!')
+                return
+                        
+            rec = Rectangle((p.x, p.y), 1, 1, color='c')
+            ax.add_patch(rec)
+    
+            # plt.draw()
+            plt.pause(0.05)
+
+            if self.IsEndPoint(p):
+                return self.BuildPath(p, ax, plt, start_time, baseName="BFS")
+            
+            self.close_set.append(p)
+
+            # Process all neighbors
+            x = p.x
+            y = p.y
+            # 启发函数为曼哈顿距离，可以遍历上下左右4个点
+            self.ProcessPoint(x-1, y, p)
+            self.ProcessPoint(x, y-1, p)
+            self.ProcessPoint(x+1, y, p)
+            self.ProcessPoint(x, y+1, p)

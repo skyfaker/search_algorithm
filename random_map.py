@@ -14,10 +14,10 @@ class Point:
 
 class RandomMap:
     """
-    生成随机地图，默认地图50*50
+    生成随机地图，默认地图30*30
     """
 
-    def __init__(self, size=50):  # 默认地图50*50
+    def __init__(self, size=30):  # 默认地图
         self.size = size
         self.obstacle = size // 3
         self.GenerateObstacle()
@@ -29,7 +29,7 @@ class RandomMap:
         self.obstacle_point.append(Point(self.size // 2, self.size // 2 - 1))
 
         # Generate an obstacle in the middle
-        for i in range(self.size // 2 - 4, self.size // 2):
+        for i in range(self.size // 2 - (self.size // 10) - 1, self.size // 2):
             self.obstacle_point.append(Point(i, self.size - i))
             self.obstacle_point.append(Point(i, self.size - i - 1))
             self.obstacle_point.append(Point(self.size - i, i))
