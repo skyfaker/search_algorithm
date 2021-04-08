@@ -8,7 +8,7 @@ import random_map
 import math
 
 
-# 父类，定义公用方法
+# 父类，定义子类公用方法
 class search_algorithm:
     def __init__(self, map):
         self.map = map
@@ -23,17 +23,18 @@ class search_algorithm:
             return False
         return not self.map.IsObstacle(x, y)
 
-    def IsInPointList(self, p, point_list):
-        for point in point_list:
+    def IsInOpenList(self, p):
+        for point in self.open_set:
+            if point.x == p.x and point.y == p.y:
+                p = point
+                return p
+        return False
+
+    def IsInCloseList(self, p):
+        for point in self.close_set:
             if point.x == p.x and point.y == p.y:
                 return True
         return False
-
-    def IsInOpenList(self, p):
-        return self.IsInPointList(p, self.open_set)
-
-    def IsInCloseList(self, p):
-        return self.IsInPointList(p, self.close_set)
 
     def IsStartPoint(self, p):
         return p.x == 0 and p.y == 0
@@ -48,6 +49,7 @@ class search_algorithm:
         plt.savefig(filename)
 
         # 回溯寻找路径，并绘制出来
+    
     def BuildPath(self, p, ax, plt, start_time, baseName):
         path = []
         while True:
@@ -80,6 +82,7 @@ class AStar(search_algorithm):
         y_dis = abs(p.y - 0)
         # Distance to start point
         return x_dis + y_dis + round(float((math.sqrt(2) - 2)*min(x_dis, y_dis)), 3)
+        # return x_dis + y_dis
 
     # 节点到终点的启发函数
     def HeuristicCost(self, p):
@@ -123,11 +126,11 @@ class AStar(search_algorithm):
             # Process all neighbors
             x = p.x
             y = p.y
-            # 启发函数为曼哈顿距离，可以遍历上下左右4个点
-            self.ProcessPoint(x-1, y, p)
-            self.ProcessPoint(x, y-1, p)
+            # 启发函数为曼哈顿距离，可以遍历上右下左4个点
             self.ProcessPoint(x+1, y, p)
             self.ProcessPoint(x, y+1, p)
+            self.ProcessPoint(x-1, y, p)
+            self.ProcessPoint(x, y-1, p)
 
             # 对角距离8个点
             # self.ProcessPoint(x-1, y+1, p)
@@ -141,6 +144,8 @@ class AStar(search_algorithm):
 
     # 算法关键点：判断邻点的状态，以选择下一个要遍历的点
     def ProcessPoint(self, x, y, parent):
+        if x==4 and y==11:
+            print('ssss')
         # 不合法的点
         if not self.IsValidPoint(x, y):
             return # Do nothing for invalid point
@@ -151,12 +156,15 @@ class AStar(search_algorithm):
             return # Do nothing for visited point
         
         # 邻点p在open_set，比较g(n)是否比原来更小，如果更小则更新其g(n)、优先级f(n)和其父节点
-        if self.IsInOpenList(p):
-            path = self.BaseCost(p)
-            if path < parent.g_cost+1:
+        # 这里可以删除open_set中的对应点，修改后重新加入；也可以调用函数返回改点然后对其修改
+        open_p = self.IsInOpenList(p)
+        if open_p:
+            p = open_p
+            # 比较该点前一次遍历的点和该点的父节点的g_cost
+            if parent.g_cost < p.parent.g_cost:
                 p.parent = parent
-            p.g_cost = path
-            p.f_cost = self.TotalCost(p)
+                p.g_cost = parent.g_cost + 1
+                p.f_cost = self.TotalCost(p)
 
         # 邻点p既不在open_set，也不在close_set中，设置节点p的parent为节点n，计算节点p的优先级f(n)，将节点m加入open_set中
         else:
@@ -174,9 +182,11 @@ class AStar(search_algorithm):
         selected_index = -1
         min_cost = sys.maxsize
         for p in self.open_set:
-            # cost = self.TotalCost(p)
             cost = p.f_cost
             if cost < min_cost:
+                min_cost = cost
+                selected_index = index
+            elif cost == min_cost and p.g_cost < self.open_set[selected_index].g_cost:
                 min_cost = cost
                 selected_index = index
             index += 1
