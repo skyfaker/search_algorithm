@@ -35,7 +35,7 @@
 
 ##### BFS
 
-<img src="img/BFS.png" alt="A*示例" style="zoom:70%;" />
+<img src="img/BFS.png" alt="A*示例" style="zoom:60%;" />
 
 
 
