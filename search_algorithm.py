@@ -27,7 +27,7 @@ class search_algorithm:
     def IsInOpenList(self, p):
         for point in self.open_set:
             if point.x == p.x and point.y == p.y:
-                return p
+                return point
         return False
 
     def IsInCloseList(self, p):
@@ -389,6 +389,87 @@ class Dijkstra(search_algorithm):
 
             if self.IsEndPoint(p):
                 return self.BuildPath(p, ax, plt, start_time, baseName="Dijkstra")
+            
+            self.close_set.append(p)
+
+            # Process all neighbors
+            x = p.x
+            y = p.y
+            # 启发函数为曼哈顿距离，遍历下左上右4个点
+            # 因为终点在右上方，所以优先向上和右遍历
+            self.ProcessPoint(x, y-1, p)
+            self.ProcessPoint(x-1, y, p)
+            self.ProcessPoint(x+1, y, p)
+            self.ProcessPoint(x, y+1, p)
+
+class GBFS(search_algorithm):
+    def __init__(self, map):
+        self.map = map
+        self.open_set = []
+        self.close_set = []
+
+    # 节点到终点的启发函数：对角距离，使得路径沿着中心线
+    def HeuristicCost(self, p):
+        x_dis = abs(self.map.size - 1 - p.x)
+        y_dis = abs(self.map.size - 1 - p.y)
+        # Distance to end point
+        return x_dis + y_dis + round(float((math.sqrt(2) - 2)*min(x_dis, y_dis)), 3)
+        # return (x_dis + y_dis)
+
+    # 选取代价函数最小的点，此时代价函数为终点到当前点的距离f(n) = h(n)
+    # 这里最好返回index而不是点，方便之后使用del删除
+    def SelectPointInOpenList(self):
+        index = 0
+        selected_index = -1
+        min_cost = sys.maxsize
+        for p in self.open_set:
+            cost = p.f_cost
+            if cost < min_cost:
+                min_cost = cost
+                selected_index = index
+            index += 1
+        return selected_index
+
+    def ProcessPoint(self, x, y, parent):
+        # 不合法的点，不做处理
+        if not self.IsValidPoint(x, y):
+            return
+        p = random_map.Point(x, y)
+
+        # 邻点在close_set，跳过
+        if self.IsInCloseList(p) or self.IsInOpenList(p):
+            return # Do nothing for visited point
+
+        else:
+            p.parent = parent
+            p.f_cost = self.HeuristicCost(p)
+            self.open_set.append(p)
+        print('Process Point [', p.x, ',', p.y, ']')
+
+    def RunAndSaveImage(self, ax, plt):
+        start_time = time.time()
+        start_point = random_map.Point(0, 0)
+        start_point.f_cost = 0
+        self.open_set.append(start_point)
+
+        while True:
+            index = self.SelectPointInOpenList()
+            if index < 0:
+                print('No path found, algorithm failed!!!')
+                return
+
+            p = self.open_set[index]
+            del self.open_set[index]
+
+            if (not (p.x==0 and p.y==0)) and (not (p.x==self.map.size-1 and p.y==self.map.size-1)):                        
+                rec = Rectangle((p.x, p.y), 1, 1, color='c')
+                ax.add_patch(rec)
+        
+                # plt.draw()
+                plt.pause(0.05)
+
+            if self.IsEndPoint(p):
+                return self.BuildPath(p, ax, plt, start_time, baseName="GBFS")
             
             self.close_set.append(p)
 

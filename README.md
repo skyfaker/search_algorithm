@@ -1,15 +1,15 @@
 # search_algorithm
 ### Different search algoruthm to find path in a maze
 
-目前有A*算法和BFS
+目前有A*算法、BFS、DFS、Dijkstra和GBFS（贪婪最佳优先）。
 
 
 
 #### 文件
 
-`random_map.py`包含了节点类和地图类；
+`random_map.py`包含了节点类和地图类，有随机地图与固定地图2种；
 
-`search_algorithm.py`包含了`AStar`类，即A*算法；`BFS`类，即BFS算法；
+`search_algorithm.py`包含了`AStar`类，即A*算法；`BFS`类，即BFS算法……
 
 `main.py`为入口文件。
 
@@ -21,7 +21,7 @@
 
 使用matplotlib的交互模式，实现搜索节点时的map动态刷新功能。
 
-最终保存路径图片到img文件夹。
+最终保存寻找到的路径图片到img文件夹。
 
 
 
@@ -49,12 +49,14 @@
 
 由于各自之间的路劲是一致的，所以看起来会和BFS一样。
 
+##### GBFS
 
+<img src="img/GBFS.png" alt="GBFS示例" style="zoom:60%;" />
 
 TODO：
 
 - [x] BFS
 - [x] DFS
 - [x] Dijkstra
-- [ ] GBFS
+- [x] GBFS
 

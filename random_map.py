@@ -22,9 +22,10 @@ class RandomMap:
     def __init__(self, size=30):  # 默认地图
         self.size = size
         self.obstacle = size // 3
-        self.GenerateObstacle()
+        self.GenerateFixedObstacle()
+        # self.GenerateObstacle()
 
-    # 生成障碍物
+    # 生成随机障碍物地图
     def GenerateObstacle(self):
         self.obstacle_point = []
         self.obstacle_point.append(Point(self.size // 2, self.size // 2))

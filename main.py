@@ -37,8 +37,8 @@ plt.tight_layout()
 
 plt.ion()
 
-# a_star = search_algorithm.AStar(map)
-# a_star.RunAndSaveImage(ax, plt)
+a_star = search_algorithm.AStar(map)
+a_star.RunAndSaveImage(ax, plt)
 
 # bfs = search_algorithm.BFS(map)
 # bfs.RunAndSaveImage(ax, plt)
@@ -46,8 +46,11 @@ plt.ion()
 # dfs = search_algorithm.DFS(map)
 # dfs.RunAndSaveImage(ax, plt)
 
-dijkstra = search_algorithm.Dijkstra(map)
-dijkstra.RunAndSaveImage(ax, plt)
+# dijkstra = search_algorithm.Dijkstra(map)
+# dijkstra.RunAndSaveImage(ax, plt)
+
+# gbfs = search_algorithm.GBFS(map)
+# gbfs.RunAndSaveImage(ax, plt)
 
 plt.ioff()
 plt.show()
