@@ -70,6 +70,8 @@ class search_algorithm:
         print('===== Algorithm finish in', end_time-start_time, ' seconds')
         print('===== 路径长度：{}'.format(len(path)))
 
+    def getMaxAreaPoint(self, p):
+        return max(abs(self.map.size - 1 - p.x), abs(self.map.size - 1 - p.y))
 
 class AStar(search_algorithm):
     def __init__(self, map):
@@ -82,8 +84,8 @@ class AStar(search_algorithm):
         x_dis = abs(p.x - 0)
         y_dis = abs(p.y - 0)
         # Distance to start point
-        return x_dis + y_dis + round(float((math.sqrt(2) - 2)*min(x_dis, y_dis)), 3)
-        # return x_dis + y_dis
+        # return x_dis + y_dis + round(float((math.sqrt(2) - 2)*min(x_dis, y_dis)), 3)
+        return x_dis + y_dis
 
     # 节点到终点的启发函数：曼哈顿距离
     def HeuristicCost(self, p):
@@ -94,6 +96,7 @@ class AStar(search_algorithm):
 
     def TotalCost(self, p):
         return self.BaseCost(p) + self.HeuristicCost(p)
+        # return p.g_cost + self.HeuristicCost(p)
 
     # 选取TotalCost最小的点，这里直接遍历，没有使用最小堆
     # TODO：换成最小堆
@@ -103,12 +106,23 @@ class AStar(search_algorithm):
         min_cost = sys.maxsize
         for p in self.open_set:
             cost = p.f_cost
+            # if cost < min_cost:
+            #     min_cost = cost
+            #     selected_index = index
+            # 在代价函数相同时，优先选择g(n)最小的点
+            # elif cost == min_cost and p.g_cost < self.open_set[selected_index].g_cost:
+            #     min_cost = cost
+            #     selected_index = index
+
             if cost < min_cost:
                 min_cost = cost
                 selected_index = index
-            elif cost == min_cost and p.g_cost < self.open_set[selected_index].g_cost:
-                min_cost = cost
-                selected_index = index
+            # 在代价函数相同时，优先选择与终点组成的矩形面积最大的点
+            elif cost == min_cost:
+                if self.getMaxAreaPoint(p) < self.getMaxAreaPoint(self.open_set[selected_index]):
+                    min_cost = cost
+                    selected_index = index
+
             index += 1
         return selected_index
 
@@ -131,13 +145,15 @@ class AStar(search_algorithm):
             # 比较该点前一次遍历的点和该点的父节点的g_cost，前一个遍历点小则更新父节点为前一个遍历点
             if parent.g_cost < p.parent.g_cost:
                 p.parent = parent
-                p.g_cost = parent.g_cost + 1
+                p.g_cost = self.BaseCost(p)
+                # p.g_cost = parent.g_cost + 1
                 p.f_cost = self.TotalCost(p)
 
         # 邻点p既不在open_set，也不在close_set中，设置节点p的parent为节点n，计算节点p的优先级f(n)，将节点m加入open_set中
         else:
             p.parent = parent
             p.g_cost = self.BaseCost(p)
+            # p.g_cost = parent.g_cost + 1
             p.f_cost = self.TotalCost(p)
             self.open_set.append(p)
 
@@ -357,7 +373,9 @@ class Dijkstra(search_algorithm):
             p = open_p
             if p.parent and parent.g_cost < p.parent.g_cost:
                 p.parent = parent
-                p.g_cost = parent.g_cost + 1
+                # p.g_cost = parent.g_cost + 1
+                p.g_cost = self.BaseCost(p)
+
 
         else:
             p.parent = parent
@@ -413,8 +431,8 @@ class GBFS(search_algorithm):
         x_dis = abs(self.map.size - 1 - p.x)
         y_dis = abs(self.map.size - 1 - p.y)
         # Distance to end point
-        return x_dis + y_dis + round(float((math.sqrt(2) - 2)*min(x_dis, y_dis)), 3)
-        # return (x_dis + y_dis)
+        # return x_dis + y_dis + round(float((math.sqrt(2) - 2)*min(x_dis, y_dis)), 3)
+        return (x_dis + y_dis)
 
     # 选取代价函数最小的点，此时代价函数为终点到当前点的距离f(n) = h(n)
     # 这里最好返回index而不是点，方便之后使用del删除
@@ -427,6 +445,10 @@ class GBFS(search_algorithm):
             if cost < min_cost:
                 min_cost = cost
                 selected_index = index
+            elif cost == min_cost:
+                if self.getMaxAreaPoint(p) < self.getMaxAreaPoint(self.open_set[selected_index]):
+                    min_cost = cost
+                    selected_index = index
             index += 1
         return selected_index
 
