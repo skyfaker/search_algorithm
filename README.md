@@ -29,7 +29,7 @@
 
 ##### A*
 
-代价函数$f(n) = g(n)+h(n)$，其中`g(n) = x_dis + y_dis + round(float((math.sqrt(2) - 2)*min(x_dis, y_dis)), 3)`即对角距离，使用对角距离是为了控制路线靠近中心线，`h(n) = x_dis + y_dis `即曼哈顿距离。
+代价函数 $ f(n) = g(n)+h(n) $ ，其中`g(n) = x_dis + y_dis + round(float((math.sqrt(2) - 2)*min(x_dis, y_dis)), 3)`即对角距离，使用对角距离是为了控制路线靠近中心线，`h(n) = x_dis + y_dis `即曼哈顿距离。
 
 <img src="img/AStar.png" alt="A*示例" style="zoom:70%;" />
 
