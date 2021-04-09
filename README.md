@@ -43,12 +43,18 @@
 
 <img src="img/DFS.png" alt="DFS示例" style="zoom:60%;" />
 
+##### Dijkstra
+
+<img src="img/Dijkstra.png" alt="Dijkstra示例" style="zoom:60%;" />
+
+由于各自之间的路劲是一致的，所以看起来会和BFS一样。
+
 
 
 TODO：
 
 - [x] BFS
 - [x] DFS
-- [ ] Dijkstra
+- [x] Dijkstra
 - [ ] GBFS
 

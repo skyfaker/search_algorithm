@@ -43,9 +43,11 @@ plt.ion()
 # bfs = search_algorithm.BFS(map)
 # bfs.RunAndSaveImage(ax, plt)
 
-dfs = search_algorithm.DFS(map)
-dfs.RunAndSaveImage(ax, plt)
+# dfs = search_algorithm.DFS(map)
+# dfs.RunAndSaveImage(ax, plt)
 
+dijkstra = search_algorithm.Dijkstra(map)
+dijkstra.RunAndSaveImage(ax, plt)
 
 plt.ioff()
 plt.show()
